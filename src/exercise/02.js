@@ -3,18 +3,20 @@
 
 import * as React from 'react'
 
-function Greeting({initialName = ''}) {
-  const readFromLocalStorage =
-    window.localStorage.getItem('name') ?? initialName
+function useLocalStorageState(key, defaultValue = '') {
+  const [state, setState] = React.useState(
+    () => window.localStorage.getItem(key) ?? defaultValue,
+  )
 
-  const [name, setName] = React.useState(() => readFromLocalStorage)
-
-  // Add a dependencies array for React.useEffect to
-  // avoid the callback being called too frequently.
   React.useEffect(() => {
-    window.localStorage.setItem('name', name)
-  }, [name])
+    window.localStorage.setItem(key, state)
+  }, [key, state])
 
+  return [state, setState]
+}
+
+function Greeting({initialName = ''}) {
+  const [name, setName] = useLocalStorageState('name', initialName)
   function handleChange(event) {
     setName(event.target.value)
   }
