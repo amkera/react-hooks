@@ -14,6 +14,7 @@ function Child() {
   const [count, setCount] = React.useState(() => {
     console.log('%c    Child: useState(() => 0)', 'color: tomato')
     return 0
+    //This is a lazy initializer that will get called on the first mount of the child, but the update phease of the app
   })
 
   React.useEffect(() => {
@@ -24,7 +25,8 @@ function Child() {
         'color: LightCoral',
       )
     }
-  })
+    // The function returned in a useEffect hook is a clean-up function, clea-up the iseEffect
+  }) //No dependencies listed (we depend on everything). This will run every time
 
   React.useEffect(() => {
     console.log(
@@ -37,7 +39,7 @@ function Child() {
         'color: MediumTurquoise',
       )
     }
-  }, [])
+  }, []) //We do not depend on anything, this will run once
 
   React.useEffect(() => {
     console.log('%c    Child: useEffect(() => {}, [count])', 'color: HotPink')
@@ -47,7 +49,7 @@ function Child() {
         'color: HotPink',
       )
     }
-  }, [count])
+  }, [count]) //This will run when count changes
 
   const element = (
     <button onClick={() => setCount(previousCount => previousCount + 1)}>
@@ -61,11 +63,11 @@ function Child() {
 }
 
 function App() {
-  console.log('%cApp: render start', 'color: MediumSpringGreen')
+  console.log('%cApp: render start', 'color: MediumSpringGreen') //1
 
   const [showChild, setShowChild] = React.useState(() => {
     console.log('%cApp: useState(() => false)', 'color: tomato')
-    return false
+    return false //2
   })
 
   React.useEffect(() => {
@@ -73,7 +75,7 @@ function App() {
     return () => {
       console.log('%cApp: useEffect(() => {}) cleanup 🧹', 'color: LightCoral')
     }
-  })
+  }) //4
 
   React.useEffect(() => {
     console.log('%cApp: useEffect(() => {}, [])', 'color: MediumTurquoise')
@@ -83,7 +85,7 @@ function App() {
         'color: MediumTurquoise',
       )
     }
-  }, [])
+  }, []) //5
 
   React.useEffect(() => {
     console.log('%cApp: useEffect(() => {}, [showChild])', 'color: HotPink')
@@ -93,7 +95,7 @@ function App() {
         'color: HotPink',
       )
     }
-  }, [showChild])
+  }, [showChild]) //6
 
   const element = (
     <>
@@ -119,7 +121,7 @@ function App() {
     </>
   )
 
-  console.log('%cApp: render end', 'color: MediumSpringGreen')
+  console.log('%cApp: render end', 'color: MediumSpringGreen') //3
 
   return element
 }
