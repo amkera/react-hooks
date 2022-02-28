@@ -6,11 +6,16 @@ import * as React from 'react'
 //Child Component
 //Name and onNameChange props also need to be passed to child component in the App, when App
 //renders the child component
-function Name({name, onNameChange}) {
+function Name() {
+  const [name, setName] = React.useState('')
   return (
     <div>
       <label htmlFor="name">Name: </label>
-      <input id="name" value={name} onChange={onNameChange} />
+      <input
+        id="name"
+        value={name}
+        onChange={event => setName(event.target.value)}
+      />
     </div>
   )
 }
@@ -28,23 +33,22 @@ function FavoriteAnimal({animal, onAnimalChange}) {
 }
 //Name and animal props also need to be passed to child component in the App, when App
 //renders the child component
-function Display({name, animal}) {
-  return <div>{`Hey ${name}, your favorite animal is: ${animal}!`}</div>
+function Display({animal}) {
+  return <div>{`Your favorite animal is: ${animal}!`}</div>
 }
 
 //Parent Component
 function App() {
   const [animal, setAnimal] = React.useState('')
-  const [name, setName] = React.useState('')
   //We colocated state to the lowest common parent of the 2 child components
   return (
     <form>
-      <Name name={name} onNameChange={event => setName(event.target.value)} />
+      <Name />
       <FavoriteAnimal
         animal={animal}
         onAnimalChange={event => setAnimal(event.target.value)}
       />
-      <Display name={name} animal={animal} />
+      <Display animal={animal} />
     </form>
   )
 }
