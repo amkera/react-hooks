@@ -5,13 +5,21 @@ import * as React from 'react'
 
 function Board() {
   // 🐨 squares is the state for this component. Add useState for squares
-  const [squares, setSquares] = React.useState(Array(9).fill(null))
+  const [squares, setSquares] = React.useState(() => {
+    JSON.parse(window.localStorage.getItem('squares') || Array(9).fill(null))
+  })
+
+  React.useEffect(() => {
+    window.localStorage.setItem('squares', JSON.stringify(squares))
+  }, [squares])
 
   // 🐨 We'll need the following bits of derived state:
   // - nextValue ('X' or 'O')
   const nextValue = calculateNextValue(squares)
+
   // - winner ('X', 'O', or null)
   const winner = calculateWinner(squares)
+
   // - status (`Winner: ${winner}`, `Scratch: Cat's game`, or `Next player: ${nextValue}`)
   const status = calculateStatus(winner, squares, nextValue)
 
