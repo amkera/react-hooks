@@ -12,49 +12,42 @@ function useLocalStorageState(
   {serialize = JSON.stringify, deserialize = JSON.parse} = {},
 ) {
   const [state, setState] = React.useState(() => {
+    //lazy state initialization, () => is used to only run this expensive computation once
     const valueInLocalStorage = window.localStorage.getItem(key)
     if (valueInLocalStorage) {
-      try {
-        return deserialize(valueInLocalStorage) //JSON string => JS object
-      } catch (error) {
-        window.localStorage.removeItem(key)
-        console.error(error)
-      }
+      return deserialize(valueInLocalStorage)
     }
     return typeof defaultValue === 'function' ? defaultValue() : defaultValue
-    //If the default value is a function, call it. This helps with a computationally expensive operation (lazy loading)
+    //if the defaultValue is a computationally expensive function, we can check that it's a function, and if it is, run it.
   })
 
-  const prevKeyRef = React.useRef(key) //If previous key changes between renders, we can remove that item from local storage and set it to the new key
+  const previousKeyRef = React.useRef(key)
+  // What if the key changes? Need to remove the old value from the previous key and set the new one.
+  // useRef provides an object that you can mutate without triggering rerenders.
 
-  //If the key, state, or serialize function have changed, run this code:
   React.useEffect(() => {
-    const prevKey = prevKeyRef.current
-    if (prevKey !== key) {
-      window.localStorage.removeItem(prevKey)
+    const previousKey = previousKeyRef.current
+    if (previousKey !== key) {
+      window.localStorage.removeItem(previousKey)
     }
-    prevKeyRef.current = key
-    window.localStorage.setItem(key, serialize(state)) //support objects, numbers, booleans, etc.
+    previousKeyRef.current = key
+    window.localStorage.setItem(key, serialize(state))
   }, [key, state, serialize])
-  // key is name, and state is what the user is typing
 
   return [state, setState]
 }
 
 function Greeting({initialName = ''}) {
   const [name, setName] = useLocalStorageState('name', initialName)
-
   function handleChange(event) {
     setName(event.target.value)
   }
 
   return (
     <div>
-      <form>
-        <label htmlFor="name">Name: </label>
-        <input value={name} onChange={handleChange} id="name" />
-      </form>
-      {name ? <strong>Hello {name}</strong> : 'Please type your name'}
+      <label htmlFor="name">Name: </label>
+      <input value={name} onChange={handleChange} id="name" />
+      <form>{name ? <strong>Hello, {name}</strong> : 'type your name'}</form>
     </div>
   )
 }
